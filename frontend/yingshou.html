@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>营收系统</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 160vh;
+            background-color: #f5f5f5;
+            padding: 20px;
+            box-sizing: border-box;
+            position: relative; /* 使按钮相对于页面定位 */
+        }
+
+        h1 {
+            color: #962ff6;
+            margin-bottom: 20px;
+        }
+
+        .container2, .container3, .container4 {
+            margin: 0 5px;
+            overflow-y: auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            width: 98%;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        .container2 {
+            height: auto;  
+        }
+
+        .container3 {
+            height: auto;  
+        }
+
+        .container4 {
+            height: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 30px; /* 增加子元素之间的间距 */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .monthly-revenue-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            gap: 20px;
+        }
+
+        .revenue-table {
+            width: 40%;
+            overflow-x: auto;
+        }
+
+        .chart-container {
+            width: 55%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #bf84f6;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .no-results {
+            color:  #9528fa;
+            text-align: center;
+        }
+
+        .profit-container {
+            width: 40%;
+        }
+
+        .profit-container canvas {
+            width: 100%;
+            height: 200px;  
+        }
+
+        /* 样式：一键备份按钮 */
+        .backup-button {
+            padding: 10px 20px;
+            background-color: #962ff6;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .backup-button:hover {
+            background-color: #7d1bb3;
+        }
+    </style>
+</head>
+<body>
+    <h1>营收报表系统</h1>
+    <p><a href="manage.html" style="color: #962ff6; text-decoration: underline;">前往车次管理页面</a></p>
+
+    <!-- 一键备份按钮 -->
+    <button class="backup-button" id="backup-button">一键备份</button>
+
+    <!-- 订单信息容器 -->
+    <div class="container2">
+        <h3>所有订单信息</h3>
+        <div id="query-results"></div>
+    </div>
+
+    <!-- 每月收入容器 -->
+    <div class="container3">
+        <h3>每月收入</h3>
+        <div class="monthly-revenue-container">
+            <!-- 收入表格 -->
+            <div class="revenue-table" id="monthly-revenue"></div>
+            <!-- 图表容器 -->
+            <div class="chart-container">
+                <canvas id="monthly-revenue-chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理员薪资与利润容器 -->
+    <div class="container4">
+        <div class="profit-container" id="admin-salary"></div>
+        <div class="profit-container" id="profit"></div>
+        <div class="profit-container">
+            <canvas id="profit-chart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // 请求车次信息
+        async function fetchOrderData() {
+            try {
+                const response = await fetch('http://localhost:3000/api/orders', { method: 'GET' });
+                if (!response.ok) {
+                    throw new Error(`HTTP错误！状态码: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.length === 0) {
+                    document.getElementById('query-results').innerHTML = `<p class="no-results">没有找到订单</p>`;
+                } else {
+                    updateOrderTable(data);
+                    updateMonthlyRevenue(data); // 更新每月收入
+                }
+            } catch (error) {
+                document.getElementById('query-results').innerHTML = `<p class="no-results">请求失败：${error.message}，请稍后再试。</p>`;
+                console.error("请求车次数据失败:", error);
+            }
+        }
+
+        // 更新订单表格显示
+        function updateOrderTable(data) {
+            const resultsDiv = document.getElementById('query-results');
+            const table = document.createElement('table');
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>车次</th>
+                        <th>出发地</th>
+                        <th>目的地</th>
+                        <th>出发时间</th>
+                        <th>到达时间</th>
+                        <th>车票类型</th>
+                        <th>车票数量</th>
+                        <th>票价</th>
+                        <th>总价（元）</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.map(order => `
+                        <tr>
+                            <td>${order.ticket_id}</td>
+                            <td>${order.departure_location}</td>
+                            <td>${order.destination_location}</td>
+                            <td>${new Date(order.departure_time).toLocaleString()}</td>
+                            <td>${new Date(order.arrival_time).toLocaleString()}</td>
+                            <td>${order.seat_type}</td>
+                            <td>${order.total_tickets}</td>
+                            <td>${parseFloat(order.ticket_price).toFixed(2)}</td>
+                            <td>${parseFloat(order.total_price).toFixed(2)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            `;
+            resultsDiv.innerHTML = "";
+            resultsDiv.appendChild(table);
+        }
+
+        // 更新每月收入表格显示并绘制折线图
+        function updateMonthlyRevenue(data) {
+            const monthlyRevenue = {};
+
+            data.forEach(order => {
+                const arrivalDate = new Date(order.arrival_time);
+                const monthYear = `${arrivalDate.getFullYear()}-${arrivalDate.getMonth() + 1}`;
+
+                if (!monthlyRevenue[monthYear]) {
+                    monthlyRevenue[monthYear] = 0;
+                }
+
+                monthlyRevenue[monthYear] += parseFloat(order.total_price);
+            });
+
+            // 更新每月收入表格
+            const revenueDiv = document.getElementById('monthly-revenue');
+            const table = document.createElement('table');
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>月份</th>
+                        <th>总收入（元）</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${Object.entries(monthlyRevenue).map(([month, totalRevenue]) => `
+                        <tr>
+                            <td>${month}</td>
+                            <td>${totalRevenue.toFixed(2)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            `;
+            revenueDiv.innerHTML = "";
+            revenueDiv.appendChild(table);
+
+            // 绘制每月收入折线图
+            const ctx = document.getElementById('monthly-revenue-chart').getContext('2d');
+            const months = Object.keys(monthlyRevenue);
+            const revenues = months.map(month => monthlyRevenue[month]);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: '每月收入',
+                        data: revenues,
+                        fill: false,
+                        borderColor: '#962ff6',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: '月份'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '总收入 (元)'
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // 获取管理员薪资并计算利润
+            fetchAdminSalary(monthlyRevenue);
+        }
+
+        // 请求管理员薪资并计算利润
+        async function fetchAdminSalary(monthlyRevenue) {
+            try {
+                const response = await fetch('http://localhost:3000/api/admins/salary', { method: 'GET' });
+                if (!response.ok) {
+                    throw new Error(`HTTP错误！状态码: ${response.status}`);
+                }
+
+                const admins = await response.json();
+                const totalSalary = admins.reduce((sum, admin) => sum + parseFloat(admin.salary), 0); // 计算总薪资
+
+                const profit = Object.entries(monthlyRevenue).map(([month, revenue]) => {
+                    return {
+                        month: month,
+                        profit: (revenue - totalSalary).toFixed(2)
+                    };
+                });
+
+                // 显示管理员薪资表格
+                updateAdminSalaryTable(admins, totalSalary, profit);
+            } catch (error) {
+                console.error("请求管理员薪资数据失败:", error);
+                document.getElementById('admin-salary').innerHTML = `<p class="no-results">请求失败：${error.message}，请稍后再试。</p>`;
+            }
+        }
+
+        // 更新管理员薪资表格
+        function updateAdminSalaryTable(admins, totalSalary, profit) {
+            const salaryDiv = document.getElementById('admin-salary');
+            const table = document.createElement('table');
+            salaryDiv.innerHTML = `
+            <h3>员工薪资</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>管理员</th>
+                        <th>薪资 (元)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${admins.map(admin => `
+                        <tr>
+                            <td>${admin.username}</td>
+                            <td>${parseFloat(admin.salary).toFixed(2)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+                </table>
+            `;
+
+            // 显示利润
+            const profitDiv = document.getElementById('profit');
+            profitDiv.innerHTML = `
+            <h3>利润计算</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>月份</th>
+                            <th>利润 (元)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${profit.map(item => `
+                            <tr>
+                                <td>${item.month}</td>
+                                <td>${item.profit}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            // 绘制利润折线图
+            const profitCtx = document.getElementById('profit-chart').getContext('2d');
+            const profitMonths = profit.map(item => item.month);
+            const profitValues = profit.map(item => parseFloat(item.profit));
+
+            new Chart(profitCtx, {
+                type: 'line',
+                data: {
+                    labels: profitMonths,
+                    datasets: [{
+                        label: '每月利润',
+                        data: profitValues,
+                        fill: false,
+                        borderColor: '#ff6347',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: '月份'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '利润 (元)'
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // 初始化车次数据
+        fetchOrderData();
+        document.getElementById('backup-button').addEventListener('click', async function () {
+    try {
+        // 发送请求到后端的备份接口
+        const response = await fetch('http://localhost:3000/api/backup');
+        if (!response.ok) {
+            throw new Error(`备份请求失败，状态码: ${response.status}`);
+        }
+
+        // 获取当前本地时间
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+
+        // 格式化本地时间为 'YYYY-MM-DD_HH-MM-SS'
+        const timestamp = `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+
+        // 提示用户下载备份文件
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        
+        // 使用当前时间作为文件名的一部分
+        link.href = url;
+        link.download = `database_backup_${timestamp}.zip`;  // 设置下载文件名，包含本地时间戳
+
+        // 触发下载
+        link.click();
+
+        // 释放Blob URL
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        // 弹出错误信息
+        alert(`备份失败：${error.message}`);
+    }
+});
+
+    </script>
+</body>
+</html>

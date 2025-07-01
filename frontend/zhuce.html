@@ -1,0 +1,132 @@
+<!DOCTYPE html>  
+<html lang="zh">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>注册</title>  
+    <link rel="stylesheet" href="stylesheet">  
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">  
+    <style>  
+        body {  
+            font-family: 'Roboto', sans-serif;  
+            background-color: #f5f5f5;  
+            display: flex;  
+            justify-content: center;  
+            align-items: center;  
+            height: 100vh;  
+            margin: 0;  
+        }  
+        .container {  
+            background-color: white;  
+            padding: 20px;  
+            border-radius: 5px;  
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);  
+            width: 300px;  
+        }  
+        h2 {  
+            text-align: center;  
+        }  
+        input[type="text"],  
+        input[type="password"] {  
+            width: 100%;  
+            padding: 10px;  
+            margin: 10px 0;  
+            border: 1px solid #ccc;  
+            border-radius: 5px;  
+        }  
+        .btn {  
+            background-color: #962ff6;  
+            color: white;  
+            padding: 10px;  
+            border: none;  
+            border-radius: 5px;  
+            cursor: pointer;  
+            width: 100%;  
+            margin-top: 10px;  
+        }  
+        .btn:hover {  
+            background-color: #6409af;  
+        }  
+        .login-prompt {  
+            text-align: center;  
+            margin-top: 15px;  
+        }  
+        .login-prompt a {  
+            text-decoration: none;  
+            color: #007bff;  
+        }  
+        .error-message {  
+            color: red;  
+            font-size: 12px;  
+            margin-bottom: 10px;  
+        }  
+    </style>  
+</head>  
+<body>  
+    <div class="container">  
+        <h2>注册</h2>  
+        <input type="text" id="reg-username" placeholder="用户名" required>  
+        <div id="username-error" class="error-message"></div>
+
+        <input type="password" id="reg-password" placeholder="密码" required>  
+        <div id="password-error" class="error-message"></div>
+
+        <input type="password" id="reg-password-confirm" placeholder="确认密码" required>  
+        <div id="confirm-password-error" class="error-message"></div>
+
+        <button class="btn" type="button" onclick="register()">注册</button>  
+        
+        <div class="login-prompt">  
+            <p>已有账号？<a href="index.html">登录</a></p>  
+        </div>  
+    </div>  
+
+    <script>  
+        async function register() {  
+            const username = document.getElementById('reg-username').value.trim();  
+            const password = document.getElementById('reg-password').value;  
+            const confirmPassword = document.getElementById('reg-password-confirm').value;  
+
+            // 清空错误信息  
+            document.getElementById('username-error').innerText = '';  
+            document.getElementById('password-error').innerText = '';  
+            document.getElementById('confirm-password-error').innerText = '';  
+
+            // 验证用户名  
+            if (!username || username.length < 4) {  
+                document.getElementById('username-error').innerText = '用户名不能为空且至少为4个字符';  
+                return;  
+            }  
+
+            // 验证密码  
+            if (!password || password.length < 8 || !/\d/.test(password) || !/[a-zA-Z]/.test(password)) {  
+                document.getElementById('password-error').innerText = '密码至少8个字符，且包含字母和数字';  
+                return;  
+            }  
+
+            // 验证确认密码  
+            if (password !== confirmPassword) {  
+                document.getElementById('confirm-password-error').innerText = '两次密码输入不一致！';  
+                return;  
+            }  
+
+            // 发送注册请求  
+            const response = await fetch('http://localhost:3000/register', {  
+                method: 'POST',  
+                headers: {  
+                    'Content-Type': 'application/json'  
+                },  
+                body: JSON.stringify({ username, password })  
+            });  
+
+            const data = await response.json();  
+            if (response.ok) {  
+                alert(data.message);  
+                window.location.href = 'index.html'; // 注册成功，跳转到登录页面  
+            } else {  
+                alert(data.error); // 注册失败，显示错误信息  
+            }  
+        }  
+    </script>  
+</body>  
+</html>

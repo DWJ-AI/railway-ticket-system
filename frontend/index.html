@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <h1>火车站购票系统</h1>
+
+    <div class="container">
+        <h2>用户登录</h2>
+        <input type="text" id="username" placeholder="用户名" required>
+        <input type="password" id="password" placeholder="密码" required>
+        <button class="btn" onclick="userLogin()">登录</button>
+
+        <div class="register-prompt">
+            <p>还没有账号？<a href="zhuce.html">立即注册</a></p>
+        </div>
+
+        <div class="register-container">
+            <h3>管理员登录</h3>
+            <input type="text" id="reg-username" placeholder="管理员用户名" required>
+            <input type="password" id="reg-password" placeholder="管理员密码" required>
+            <button class="btn" onclick="adminLogin()">登录</button>
+        </div>
+    </div>
+
+    <script>
+        // 用户登录
+        async function userLogin() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (username && password) {
+                try {
+                    const response = await fetch('http://localhost:3000/login', {  // 请求登录接口
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ username, password }),
+                    });
+
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        alert('登录成功！');
+                        window.location.href = 'purchase.html';  // 登录成功后跳转到购票页面
+                    } else {
+                        alert(data.error || '登录失败');
+                    }
+                } catch (error) {
+                    alert('网络错误，请稍后再试');
+                }
+            } else {
+                alert('请输入用户名和密码');
+            }
+        }
+
+         // 管理员登录功能
+         async function adminLogin() {
+            const username = document.getElementById('reg-username').value.trim();
+            const password = document.getElementById('reg-password').value.trim();
+            if (username && password) {
+                const response = await fetch('http://localhost:3000/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert('登录成功！');
+                    window.location.href = 'manage.html';  
+                } else {
+                    alert(data.error || '登录失败');
+                }
+            } else {
+                alert('请输入管理员用户名和密码');
+            }
+        }
+    </script>
+</body>
+</html>

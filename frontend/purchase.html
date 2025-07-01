@@ -1,0 +1,508 @@
+<!DOCTYPE html>  
+<html lang="zh">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>购票系统</title>  
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {  
+            font-family: 'Roboto', sans-serif;  
+            display: flex;  
+            flex-direction: column;  
+            align-items: center;  
+            justify-content: flex-start;  
+            height: 100vh;  
+            background-color: #f5f5f5;  
+            padding: 20px;  
+            box-sizing: border-box;  
+        }  
+
+        h1 {  
+            color: #962ff6;  
+            margin-bottom: 20px;  
+        }  
+
+        .container {  
+            display: flex;  
+            width: 100%;  
+            margin: 0 2px; 
+            justify-content: flex-start;
+            margin-top: 10px;
+            padding: 0 5px; 
+
+        }  
+        .container1{  
+            display: flex;  
+            width: 100%;  
+            margin: 0 2px; 
+            justify-content: flex-start;
+            margin-top: 10px;
+            padding: 0 5px; 
+            margin-bottom: 120px;  /* 增加下边距 */
+            bottom: 120px; 
+            
+        }  
+        .container2{  
+            bottom: 10px; 
+            margin-bottom: 120px;  /* 增加与页面底部的距离 */
+        }  
+        .panel1,.panel2,.panel3,.panel4,.panel5 {
+            overflow: hidden;
+            background: white;
+            border-radius: 8px;
+            margin: 0 3px; 
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            padding: 10px;
+            /* margin-bottom: 15px; */
+        }
+        .panel1 {  
+            width: 25%;
+        }  
+        .panel2 {  
+            width: 75%;
+            height: 260px;  /* 设置固定高度 */
+            overflow-y: auto;  /* 超出时显示滚动条 */
+        }
+
+        .panel3 {  
+            width: 25%;
+        } 
+        .panel4 {  
+            width: 55%;
+            height: 300px;  /* 设置固定高度 */
+            overflow-y: auto;  /* 超出时显示滚动条 */
+        }
+        .panel5 {  
+            width: 75%;
+            height: 300px;  /* 设置固定高度 */
+            overflow-y: auto;  /* 超出时显示滚动条 */
+
+        }
+
+        .btn {  
+            padding: 10px 20px;  
+            font-size: 16px;  
+            background-color: #962ff6;  
+            color: white;  
+            border: none;  
+            cursor: pointer;  
+            width: 100%;  
+            margin-top: 20px;  
+        }  
+
+        .btn:hover {  
+            background-color: #6409af;  
+        }  
+    </style>
+</head>
+<body>
+    <h1>欢迎来到购票页面</h1>  
+    <div class="container2">
+    <div class="container">
+        <div class="panel1">  
+            <h2>购票须知</h2>  
+            <p>1. 请确保填写正确的出发地和目的地。</p>  
+            <p>2. 购票时请注意选择合适的出发和到达时间。</p>  
+            <p>3. 团体购票需输入团体成员的用户名，请在购票时填写。</p>  
+            <p>4. 如有任何问题，请联系客服。</p>  
+        </div>  
+        <div class="panel2">
+            <h2>所有车票信息</h2>
+            <div id="query-results"></div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="panel3">  
+            <h2>查询车次</h2>  
+            <div class="input-container">  
+                <label for="departure">出发地:</label>  
+                <input type="text" id="departure" list="popular-departures" placeholder="选择或输入出发地" required>  
+                <datalist id="popular-departures">  
+                    <option value="北京"></option>  
+                    <option value="上海"></option>  
+                    <option value="广州"></option>  
+                    <option value="深圳"></option>  
+                    <option value="成都"></option>  
+                    <option value="重庆"></option>  
+                    <option value="西安"></option>  
+                </datalist>  
+            </div>  
+            <div class="input-container">  
+                <label for="destination">目的地:</label>  
+                <input type="text" id="destination" list="popular-destinations" placeholder="选择或输入目的地" required>  
+                <datalist id="popular-destinations">  
+                    <option value="北京"></option>  
+                    <option value="上海"></option>  
+                    <option value="广州"></option>  
+                    <option value="深圳"></option>  
+                    <option value="成都"></option>  
+                    <option value="重庆"></option>  
+                    <option value="西安"></option>  
+                </datalist>  
+            </div>  
+            <div class="input-container">  
+                <label for="earliest-departure">最早出发时间:</label>  
+                <input type="datetime-local" id="earliest-departure" required>  
+            </div>  
+            <div class="input-container">  
+                <label for="latest-departure">最晚出发时间:</label>  
+                <input type="datetime-local" id="latest-departure" required>  
+            </div>  
+            <button class="btn" onclick="searchTrains()">查询</button>
+            
+        </div>
+        <div class="panel5">
+            <h2>查询结果</h2>
+            <div id="train-results"></div>
+        </div>
+        
+    </div>
+    <div class="container1">
+        
+        
+         
+        <div class="panel4">  
+            <h2>温馨提示</h2>  
+            <ul>
+                <li>1. 购票前请确保您已登录，未登录用户无法进行购票操作。</li>
+                <li>2. 如遇系统繁忙，请耐心等待，或尝试稍后再试。</li>
+                <li>3. 票务信息将根据实际情况更新，购票后请及时确认票务信息。</li>
+                <li>4. 为了确保顺利登车，建议您提前到达车站，至少提前30分钟。</li>
+                <li>5. 退票政策：购买的车票可以在规定时间内退票，具体退票规则请参阅票务条款。</li>
+                <li>6. 请妥善保管您的票务信息，避免遗失。如有遗失，请及时联系客服。</li>
+                <li>7. 若您在使用过程中遇到任何问题，请通过我们的客服渠道进行反馈。</li>
+                <li>8. 请注意保持良好的车厢秩序，确保您的旅行愉快。</li>
+            </ul>
+        </div>
+
+        <div class="panel5">
+            <h2>已定车票信息</h2>
+            <div id="already-results"></div>
+            
+        <!-- </div>
+        <div class="panel1">  
+            
+            <h2>退票</h2>  
+            <button class="btn" onclick="cancelTickets()">退票</button>  
+        </div> -->
+    </div>
+</div>
+    <script>
+        // 请求车次信息
+        async function fetchTrainData() {
+            try {
+                const response = await fetch('http://localhost:3000/trains1');
+                const data = await response.json();
+
+                if (data.length === 0) {
+                    document.getElementById('query-results').innerHTML = `<p class="no-results">没有找到车次</p>`;
+                } else {
+                    updateTrainTable(data);
+                }
+            } catch (error) {
+                document.getElementById('query-results').innerHTML = `<p class="no-results">没有找到车次。</p>`;
+                console.error("请求车次数据失败:", error);
+            }
+        }
+
+        // 将 UTC 时间转换为北京时间
+        function convertToBeijingTime(utcTime) {
+            const date = new Date(utcTime);  // 转换为 Date 对象
+            const options = { 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: false 
+            };
+            return date.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai', ...options });
+        }
+        // 初始化车次数据
+        fetchTrainData();
+
+        //查询
+        function searchTrains() {
+            const departure = document.getElementById('departure').value;
+            const destination = document.getElementById('destination').value;
+            const earliestDeparture = document.getElementById('earliest-departure').value;
+            const latestDeparture = document.getElementById('latest-departure').value;
+
+            // 请求后端查询接口
+            fetch(`http://localhost:3000/trains/search?departure=${departure}&destination=${destination}&earliestDeparture=${earliestDeparture}&latestDeparture=${latestDeparture}`)
+                .then(response => response.json())
+                .then(data => {
+                    // 如果查询到数据
+                    if (data && data.length > 0) {
+                        updateTrainTable1(data);
+                        
+                    } else {
+                        document.getElementById('train-results').innerHTML = '没有符合条件的车次';
+                    }
+                })
+                .catch(error => {
+                    console.error('查询车次失败:', error);
+                    document.getElementById('train-results').innerHTML = '查询车次失败，请稍后再试';
+                });
+        }
+
+        // 更新表格显示车次信息
+        function updateTrainTable(data) {
+            const resultsDiv = document.getElementById('query-results');
+            const table = document.createElement('table');
+            table.style.width = "100%";  // 让表格宽度充满父容器
+            table.style.borderCollapse = "collapse"; // 去除单元格间的间距
+            table.style.border = "1px solid #ddd";  // 添加表格边框
+
+            // 表头
+            table.innerHTML = `
+                <thead>
+                    <tr style="background-color: #f0f0f0;">
+                        <th style="border: 1px solid #ddd; padding: 8px;">车次</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">出发地</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">目的地</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">出发时间</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">到达时间</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">一等座票价</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">一等座余量</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">二等座票价</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">二等座余量</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">二等卧票价</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">二等卧余量</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">一等卧票价</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">一等卧余量</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.map(train => `
+                        <tr>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${train.train_number}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${train.departure_location}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${train.destination_location}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${convertToBeijingTime(train.departure_time).replace('T', ' ')}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${convertToBeijingTime(train.arrival_time).replace('T', ' ')}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${train.first_class_price}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${train.first_class_availability}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${train.second_class_price}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${train.second_class_availability}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${train.sleeper_class_price}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${train.sleeper_class_availability}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${train.first_sleeper_class_price}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${train.first_sleeper_class_availability}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            `;
+            resultsDiv.innerHTML = "";
+            resultsDiv.appendChild(table);
+        }
+
+        // 更新表格显示查询结果车次信息，并增加座位选择
+        function updateTrainTable1(data) {
+            const resultsDiv = document.getElementById('train-results');
+            const table = document.createElement('table');
+            table.style.width = "100%";  // 让表格宽度充满父容器
+            table.style.borderCollapse = "collapse"; // 去除单元格间的间距
+            table.style.border = "1px solid #ddd";  // 添加表格边框
+
+            // 表头
+            table.innerHTML = `
+                <thead>
+                    <tr style="background-color: #f0f0f0;">
+                        <th style="border: 1px solid #ddd; padding: 8px;">车次</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">出发地</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">目的地</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">出发时间</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">到达时间</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">一等座票价</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">一等座余量</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">二等座票价</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">二等座余量</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">二等卧票价</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">二等卧余量</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">一等卧票价</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">一等卧余量</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">座位选择</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.map(train => `
+                        <tr>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${train.train_number}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${train.departure_location}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${train.destination_location}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${convertToBeijingTime(train.departure_time).replace('T', ' ')}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${convertToBeijingTime(train.arrival_time).replace('T', ' ')}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${train.first_class_price}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${train.first_class_availability}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${train.second_class_price}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${train.second_class_availability}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${train.sleeper_class_price}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${train.sleeper_class_availability}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${train.first_sleeper_class_price}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">${train.first_sleeper_class_availability}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px;">
+                                <div class="seat-select">
+                                    <select id="seat-type-${train.train_number}" onchange="logSelection(${train.train_number})">
+                                        <option value="">选择座位类型</option>
+                                        <option value="first_class">一等座</option>
+                                        <option value="second_class">二等座</option>
+                                        <option value="sleeper_class">二等卧</option>
+                                        <option value="first_sleeper_class">一等卧</option>
+                                    </select>
+                                    <button class="btn" onclick="checkAvailabilityAndRedirect('${train.train_number}', document.getElementById('seat-type-${train.train_number}').value)">购票</button>
+
+
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            `;
+            resultsDiv.innerHTML = "";
+            resultsDiv.appendChild(table);
+        }
+
+        function logSelection(trainNumber) {
+            // 获取当前选择的座位类型
+            const seatType = document.getElementById(`seat-type-${trainNumber}`).value;
+             // 获取车次号，记录到控制台或日志
+            console.log(`车次号: ${trainNumber}, 座位类型: ${seatType}`);
+        }
+
+        function checkAvailabilityAndRedirect(trainNumber, seatType) {
+            // 检查是否选择了座位类型
+            if (!seatType) {
+                alert('请先选择座位类型');
+                return;  // 如果没有选择座位类型，直接返回
+            }
+
+            // 请求后端检查是否有余票
+            fetch(`http://localhost:3000/trains/checkAvailability?trainNumber=${trainNumber}&seatType=${seatType}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.available) {
+                        // 如果有余票，跳转到 buy.html 页面
+                        window.location.href = `buy.html?train_number=${trainNumber}&seat_type=${seatType}`;
+                        alert('该车次有余票');
+                    } else {
+                        // 如果没有余票，提示无余票
+                        alert('该车次无余票');
+                    }
+                })
+                .catch(error => {
+                    console.error('检查余票失败:', error);
+                    alert('查询失败，请稍后再试');
+                });
+        }
+// 查看已定车票接口
+async function fetchBookedTickets() {
+    try {
+        const response = await fetch('http://localhost:3000/booking'); // 使用后端的 /booking 接口
+
+        // 检查响应是否成功
+        if (!response.ok) {
+            console.error(`请求失败，HTTP 状态码：${response.status}`);
+            throw new Error(`网络响应失败，状态码: ${response.status}`);
+        }
+
+        // 解析响应数据
+        const data = await response.json();
+
+        // 检查后端返回的数据结构是否符合预期
+        if (!data.success) {
+            document.getElementById('already-results').innerHTML = `<p class="no-results">错误: ${data.message || '获取车票信息失败'}</p>`;
+            return;
+        }
+
+        // 如果没有已定车票
+        if (data.bookings && data.bookings.length === 0) {
+            document.getElementById('already-results').innerHTML = `<p class="no-results">没有已定车票</p>`;
+        } else {
+            // 显示已定车票信息
+            updateBookedTicketsTable(data.bookings);
+        }
+    } catch (error) {
+        // 捕获请求失败的错误并展示
+        document.getElementById('already-results').innerHTML = `<p class="no-results">没有已定车票。</p>`;
+        console.error("请求已定车票数据失败:", error);
+    }
+}
+
+// 更新已定车票信息表格
+function updateBookedTicketsTable(data) {
+    const resultsDiv = document.getElementById('already-results'); // 使用这个容器来显示已定车票
+    const table = document.createElement('table');
+    table.style.width = "100%";  // 让表格宽度充满父容器
+    table.style.borderCollapse = "collapse"; // 去除单元格间的间距
+    table.style.border = "1px solid #ddd";  // 添加表格边框
+
+    // 表头
+    table.innerHTML = `
+        <thead>
+            <tr style="background-color: #f0f0f0;">
+                <th style="border: 1px solid #ddd; padding: 8px;">车次号</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">出发地</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">目的地</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">出发时间</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">到达时间</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">车票类型</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">车票数</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">是否退票</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${data.map(train => `
+                <tr>
+                    <td style="border: 1px solid #ddd; padding: 8px;">${train.train_number}</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">${train.departure_location}</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">${train.destination_location}</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">${convertToBeijingTime(train.departure_time).replace('T', ' ')}</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">${convertToBeijingTime(train.arrival_time).replace('T', ' ')}</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">${train.seat_type}</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">${train.num_tickets}</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">
+                        <button class="btn" onclick="cancelTicket(${train.booking_id})">退票</button>
+                    </td>
+                    </tr>
+            `).join('')}
+        </tbody>
+    `;
+
+    resultsDiv.innerHTML = ""; // 清空之前的内容
+    resultsDiv.appendChild(table); // 添加新的表格
+}
+async function cancelTicket(ticketId) {
+    try {
+        // 发送退票请求
+        const response = await fetch('http://localhost:3000/cancel-ticket', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ ticketId }) // 发送车票ID
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert('退票成功');
+            // 成功后更新已定车票信息
+            fetchBookedTickets();
+        } else {
+            alert('退票失败: ' + data.message);
+        }
+    } catch (error) {
+        console.error("请求退票失败:", error);
+        alert('请求失败，请稍后再试');
+    }
+}
+
+// 调用函数获取已定车票信息
+fetchBookedTickets();
+
+    </script>
+</body>

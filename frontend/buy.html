@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>购票</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+            background-color: #f5f5f5;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #962ff6;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .panel {
+            background-color: null;
+            border: 1px solid null;
+            border-radius: 8px;
+            padding: 20px;
+            flex: 1;
+            margin: 0px;
+            width: 80%;
+        }
+
+        .panel1 {
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            flex: 1;
+            margin: 10px;
+        }
+
+        input[type="text"], input[type="datetime-local"], input[type="number"] {
+            width: 90%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #962ff6;
+            color: white;
+            border: none;
+            cursor: pointer;
+            width: 30%;
+            margin: 20px auto 0;
+            display: block;
+        }
+
+        .btn:hover {
+            background-color: #6409af;
+        }
+
+        .input-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 20px;
+        }
+
+        .input-field {
+            width: 48%;
+            margin-bottom: 10px;
+        }
+
+        .success-message {
+            margin-top: 20px;
+            color: green;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>请选择购票方式</h1>
+    <div class="container">
+        <div class="panel">
+            <div class="panel1">
+                <h2>票价须知</h2>
+                <p><strong>1. 个人购票</strong></p>
+                <p>选择个人购票一次只能买一张票，不可替他人代买。</p>
+                <p><strong>2. 退款政策</strong></p>
+                <p>票务售出后支持退票退款，但不支持改签。</p>
+                <p><strong>3. 团体购票优惠</strong></p>
+                <p>团体购票至少5人且不多于10人。团体出行时，座位号不一定连贯！</p>
+                <p><strong>4. 票务有效期</strong></p>
+                <p>过期未使用的车票将作废，不予补票。</p>
+                <p><strong>5. 其他规定</strong></p>
+                <p>请务必携带有效身份证件，以便在乘车时核对身份。</p>
+            </div>
+            <div class="panel1">
+                <h2>个人购票</h2>
+
+                <button class="btn" onclick="purchaseTickets()">确认购票</button>
+            </div>
+        </div>
+        <div class="panel1">
+            <h2>团体购票</h2>
+            <label for="num-tickets-group">购票数量:</label>
+            <input type="number" id="num-tickets-group" placeholder="输入团体购票数" min="5" max="10" value="5">
+            <button class="btn" onclick="ok()">确认</button>
+            <h2>输入团体成员信息</h2>
+            <div class="input-container" id="input-container"></div>
+            <button class="btn" onclick="submitMembers()">购票</button>
+        </div>
+    </div>
+    <button class="btn" onclick="goBack1()">返回</button>
+    <button class="btn" onclick="goBack()">退出登录</button>
+
+    <script>
+        
+
+        function purchaseTickets() {
+            const numTickets = 1;  // 假设固定为 1 张票
+            const requestData = {
+                num_tickets: numTickets
+            };
+
+            // 发送请求到后端
+            fetch('http://localhost:3000/purchase', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('购票成功');
+                    console.log(data.bookingDetails);  // 打印预定详情
+                } else {
+                    alert('购票失败: ' + data.message);  // 显示后端错误消息
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('购票请求失败');
+            });
+        }
+
+        let memberCount = 5; // 默认团体人数
+
+        // 点击确认按钮，根据团体人数生成输入框
+        function ok() {
+            memberCount = parseInt(document.getElementById("num-tickets-group").value); // 获取团体人数
+            const inputContainer = document.getElementById('input-container');
+            inputContainer.innerHTML = ''; // 清空现有输入框
+
+            // 动态生成团体成员输入框
+            for (let i = 1; i <= memberCount; i++) {
+                const inputField = document.createElement('div');
+                inputField.classList.add('input-field');
+                inputField.innerHTML = `
+                    <label for="member-username-${i}">团体成员用户名 ${i}:</label>
+                    <input type="text" id="member-username-${i}" placeholder="输入团体成员用户名">
+                `;
+                inputContainer.appendChild(inputField);
+            }
+        }
+
+        // 提交团体购票成员信息
+function submitMembers() {
+    const usernames = [];
+    let allFilled = true; // 假设所有输入框都填写
+
+    for (let i = 1; i <= memberCount; i++) {
+        const username = document.getElementById(`member-username-${i}`).value.trim();
+        if (username) {
+            usernames.push(username);
+        } else {
+            allFilled = false; // 如果有一个未填写，设置为false
+        }
+    }
+
+    if (allFilled) {
+        // 所有成员的用户名都填写了，发送请求到后端
+        const requestData = {
+            usernames: usernames  // 将用户名数组发送到后端
+        };
+
+        fetch('http://localhost:3000/group-purchase', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('团体购票成功');
+            } else {
+                alert('团体购票失败: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('团体购票请求失败');
+        });
+    } else {
+        alert('请填写全部团体成员的用户名！');
+    }
+}
+
+
+
+        // 返回到登录页面
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+
+        function goBack1() {
+            window.location.href = 'purchase.html';
+        }
+    </script>
+</body>
+</html>

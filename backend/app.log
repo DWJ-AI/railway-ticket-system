@@ -1,0 +1,41 @@
+{"level":"info","message":"用户登录成功: 用户ID=3, 用户名=dong, 登录时间=2024-12-11T13:57:15.384Z"}
+{"level":"info","message":"用户登录成功: 用户ID=3, 用户名=dong, 登录时间=2024-12-12T02:39:18.108Z"}
+{"level":"info","message":"检查余票请求: 车次号=g106, 座位类型=first_sleeper_class, ticket_id=24, 余票数量=15, 请求时间=2024-12-12T02:46:24.829Z"}
+{"level":"info","message":"检查余票请求: 车次号=g106, 座位类型=sleeper_class, ticket_id=24, 余票数量=50, 请求时间=2024-12-12T07:01:47.172Z"}
+{"level":"info","message":"用户登录成功: 用户ID=6, 用户名=user1, 登录时间=2024-12-12T07:38:47.345Z"}
+{"level":"info","message":"用户登录成功: 用户ID=6, 用户名=user1, 登录时间=2024-12-12T07:47:26.864Z"}
+{"level":"info","message":"检查余票请求: 车次号=D202, 座位类型=first_class, ticket_id=33, 余票数量=60, 请求时间=2024-12-12T07:47:50.694Z"}
+{"level":"info","message":"检查余票请求: 车次号=G101, 座位类型=second_class, ticket_id=27, 余票数量=100, 请求时间=2024-12-12T07:48:20.160Z"}
+{"level":"info","message":"用户登录成功: 用户ID=6, 用户名=user1, 登录时间=2024-12-12T08:11:13.365Z"}
+{"level":"info","message":"用户登录成功: 用户ID=6, 用户名=user1, 登录时间=2024-12-12T08:14:30.717Z"}
+{"level":"info","message":"用户登录成功: 用户ID=6, 用户名=user1, 登录时间=2024-12-12T08:15:56.211Z"}
+{"level":"info","message":"用户登录成功: 用户ID=6, 用户名=user1, 登录时间=2024-12-12T08:17:51.538Z"}
+{"level":"info","message":"用户登录成功: 用户ID=6, 用户名=user1, 登录时间=2024-12-12T08:20:20.844Z"}
+{"level":"info","message":"用户登录成功: 用户ID=7, 用户名=1111, 登录时间=2024-12-12T08:21:47.603Z"}
+{"level":"info","message":"用户登录成功: 用户ID=7, 用户名=1111, 登录时间=2024-12-12T08:23:05.093Z"}
+{"level":"info","message":"用户登录成功: 用户ID=7, 用户名=1111, 登录时间=2024-12-12T08:24:19.251Z"}
+{"level":"info","message":"用户登录成功: 用户ID=6, 用户名=user1, 登录时间=2024-12-12T08:26:14.502Z"}
+{"level":"info","message":"用户登录成功: 用户ID=6, 用户名=user1, 登录时间=2024-12-12T08:28:23.300Z"}
+{"level":"info","message":"用户登录成功: 用户ID=4, 用户名=cui1, 登录时间=2024-12-12T08:29:12.137Z"}
+{"level":"info","message":"用户登录成功: 用户ID=4, 用户名=cui1, 登录时间=2024-12-12T08:33:02.205Z"}
+{"level":"info","message":"检查余票请求: 车次号=D202, 座位类型=first_class, ticket_id=33, 余票数量=60, 请求时间=2024-12-12T08:33:24.882Z"}
+{"level":"info","message":"用户登录成功: 用户ID=7, 用户名=1111, 登录时间=2024-12-12T08:36:54.425Z"}
+{"level":"info","message":"检查余票请求: 车次号=bai520, 座位类型=first_class, ticket_id=31, 余票数量=300, 请求时间=2024-12-12T08:37:35.568Z"}
+{"level":"info","message":"检查余票请求: 车次号=bai520, 座位类型=sleeper_class, ticket_id=31, 余票数量=200, 请求时间=2024-12-12T08:39:32.618Z"}
+{"level":"info","message":"检查余票请求: 车次号=bai520, 座位类型=first_class, ticket_id=31, 余票数量=300, 请求时间=2024-12-12T08:51:04.574Z"}
+{"level":"info","message":"用户登录成功: 用户ID=4, 用户名=cui1, 登录时间=2024-12-12T09:47:56.699Z"}
+{"level":"info","message":"检查余票请求: 车次号=G101, 座位类型=first_sleeper_class, ticket_id=27, 余票数量=40, 请求时间=2024-12-12T09:48:24.868Z"}
+{"level":"info","message":"检查余票请求: 车次号=G101, 座位类型=first_class, ticket_id=27, 余票数量=50, 请求时间=2024-12-12T09:49:14.493Z"}
+{"level":"info","message":"用户登录成功: 用户ID=6, 用户名=user1, 登录时间=2024-12-12T10:10:06.643Z"}
+{"level":"info","message":"用户登录成功: 用户ID=8, 用户名=hou1, 登录时间=2024-12-12T11:08:13.274Z"}
+{"level":"info","message":"检查余票请求: 车次号=bai520, 座位类型=second_class, ticket_id=31, 余票数量=500, 请求时间=2024-12-12T11:08:38.021Z"}
+{"level":"info","message":"检查余票请求: 车次号=D202, 座位类型=sleeper_class, ticket_id=33, 余票数量=100, 请求时间=2024-12-12T11:09:04.923Z"}
+{"level":"info","message":"用户登录成功: 用户ID=4, 用户名=cui1, 登录时间=2024-12-12T11:09:44.428Z"}
+{"level":"info","message":"用户登录成功: 用户ID=9, 用户名=dong2, 登录时间=2024-12-12T11:57:22.611Z"}
+{"level":"info","message":"用户登录成功: 用户ID=9, 用户名=dong2, 登录时间=2024-12-12T11:59:38.459Z"}
+{"level":"info","message":"用户登录成功: 用户ID=10, 用户名=user2, 登录时间=2024-12-12T12:02:20.523Z"}
+{"level":"info","message":"检查余票请求: 车次号=g106, 座位类型=first_class, ticket_id=24, 余票数量=100, 请求时间=2024-12-12T12:02:45.848Z"}
+{"level":"info","message":"检查余票请求: 车次号=bai520, 座位类型=sleeper_class, ticket_id=31, 余票数量=200, 请求时间=2024-12-12T12:03:20.706Z"}
+{"level":"info","message":"用户登录成功: 用户ID=6, 用户名=user1, 登录时间=2024-12-12T12:04:17.360Z"}
+{"level":"info","message":"用户登录成功: 用户ID=8, 用户名=hou1, 登录时间=2024-12-12T12:07:30.489Z"}
+{"level":"info","message":"检查余票请求: 车次号=G103, 座位类型=first_sleeper_class, ticket_id=35, 余票数量=60, 请求时间=2024-12-28T07:11:27.285Z"}

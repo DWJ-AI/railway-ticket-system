@@ -1,0 +1,46 @@
+/* 在styles.css文件中 */
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: linear-gradient(rgba(255, 255, 255, 0.323), rgba(255, 255, 255, 0.323)), url('t.jpg');  /* 图片路径 */
+    background-size: cover;         /* 使背景图铺满整个页面 */
+    background-position: center;    /* 背景图居中显示 */
+    background-repeat: no-repeat;   /* 防止背景图片重复 */
+    height: 100vh;    /* 设置默认字体 */
+}
+
+/* 你可以根据需要设置其它容器的样式 */
+.container {
+    position: relative;
+    padding: 20px;
+    width: 300px;
+    margin: 0 auto;
+    background-color: rgba(255, 255, 255, 0.8); /* 半透明白色背景 */
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1, h2, p {
+    text-align: center;
+    color: #333;
+}
+
+input, button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #962ff6;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #6409af;
+}

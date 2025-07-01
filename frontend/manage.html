@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理系统</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            min-height: 100vh;
+            position: relative; /* 使按钮相对于页面定位 */
+        }
+        .backup-button {
+            padding: 10px 20px;
+            background-color: #962ff6;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 7%;
+        }
+        .backup-button:hover {
+            background-color: #7d1bb3;
+        }
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+            color: #962ff6;
+            width: 100%;
+        }
+        
+        .container1 {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 5px;
+            background: #f1f1f1;
+            margin-top: 20px;
+            padding: 20px;
+            gap: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 98%;
+        }
+
+        .container1 > div {
+            flex: 1;
+            min-width: 0;
+            padding: 20px;
+        }
+
+        .container2 {
+            flex: 1;
+            margin: 0 5px;
+            overflow-y: auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            width: 98%;
+            padding: 10px;
+        }
+        
+        .main-container {
+            display: flex;
+            justify-content: flex-start;
+            width: 98%;
+            margin-top: 20px;
+            padding: 0 10px;
+        }
+
+        .container, .container4, .container5 {
+            overflow: hidden;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        .container5 {
+            margin: 0 5px;
+            width: 78%;
+        }
+
+        .container, .container4 {
+            width: 12%;
+            margin: 0 5px;
+        }
+
+        input, select, button {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #962ff6;
+            color: white;
+            cursor: pointer;
+            display: block;
+            margin: 18px auto;
+        }
+
+        button:hover {
+            background-color: #6409af;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+
+        .no-results {
+            color: red;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>车次管理系统</h1>
+    <p><a href="yingshou.html" style="color: #962ff6; text-decoration: underline;">前往营收页面</a></p> <!-- 添加的链接 -->
+    <!-- 一键备份按钮 -->
+    <button class="backup-button" id="backup-button">一键备份</button>
+    <div class="container2">
+        <h3>所有车次信息</h3>
+        <div id="query-results"></div>
+    </div>
+    <div class="main-container">
+        <div class="container">
+            <h3>车次查询</h3>
+            <input type="text" id="search-train-number" placeholder="输入车次号查询">
+            <button onclick="queryTrainByNumber()">查询车次</button>
+        </div>
+        <div class="container4">
+            <h3>时间段查询</h3>
+            <label for="start-time">最早出发时间</label>
+            <input type="datetime-local" id="start-time">
+            <label for="end-time">最晚出发时间</label>
+            <input type="datetime-local" id="end-time">
+            <button onclick="queryTrainByTime()">查询时间段内车次</button>
+        </div>
+        <div class="container5" id="container5">
+        </div>
+    </div>
+
+    <div class="container1">
+        <div>
+            <h3>管理车次</h3>
+            <input type="text" id="train-number" placeholder="车次">
+            <input type="text" id="departure" placeholder="出发地">
+            <input type="text" id="destination" placeholder="目的地">
+        </div>
+        <div>
+            <label for="departure-time">出发时间</label>
+            <input type="datetime-local" id="departure-time" required>
+            <label for="arrival-time">到达时间</label>
+            <input type="datetime-local" id="arrival-time" required>
+            <input type="number" id="first-class-price" placeholder="一等座票价" step="0.01">
+            <input type="number" id="first-class-availability" placeholder="一等座余量" min="1">
+        </div>
+        <div>
+            <input type="number" id="second-class-price" placeholder="二等座票价" step="0.01">
+            <input type="number" id="second-class-availability" placeholder="二等座余量" min="1">
+            <input type="number" id="sleeper-class-price" placeholder="二等卧票价" step="0.01">
+            <input type="number" id="sleeper-class-availability" placeholder="二等卧余量" min="1">
+            <input type="number" id="first-sleeper-class-price" placeholder="一等卧票价" step="0.01">
+        </div>
+        <div>
+            <input type="number" id="first-sleeper-class-availability" placeholder="一等卧余量" min="1">
+            <div>    </div>
+            <div>    </div>
+            <button onclick="addTrain()">增加车次</button>
+            <button onclick="updateTrain()">更改车次</button>
+            <button onclick="deleteTrain()">删除车次</button>
+        </div>
+    </div>
+
+    <script>
+        // 请求车次信息
+        async function fetchTrainData() {
+            try {
+                const response = await fetch('http://localhost:3000/trains1');
+                const data = await response.json();
+
+                if (data.length === 0) {
+                    document.getElementById('query-results').innerHTML = `<p class="no-results">没有找到车次</p>`;
+                } else {
+                    updateTrainTable(data);
+                }
+            } catch (error) {
+                document.getElementById('query-results').innerHTML = `<p class="no-results">请求失败，请稍后再试。</p>`;
+                console.error("请求车次数据失败:", error);
+            }
+        }
+
+        // 查询特定车次
+        async function queryTrainByNumber() {
+            const trainNumber = document.getElementById('search-train-number').value.trim();
+            if (trainNumber) {
+                try {
+                    const response = await fetch(`http://localhost:3000/trains/number/${trainNumber}`, {
+                        method: 'GET'
+                    });
+                    const data = await response.json();
+
+                    if (data.message === '车次不存在') {
+                        document.getElementById('container5').innerHTML = `<p class="no-results">没有找到该车次</p>`;
+                    } else {
+                        updateTrainTableInContainer5([data]);
+                    }
+                } catch (error) {
+                    document.getElementById('container5').innerHTML = `<p class="no-results">请求失败，请稍后再试。</p>`;
+                    console.error("请求车次数据失败:", error);
+                }
+            }
+        }
+
+        // 查询时间段内的车次
+        async function queryTrainByTime() {
+            const startTime = document.getElementById('start-time').value;
+            const endTime = document.getElementById('end-time').value;
+
+            if (startTime && endTime) {
+                try {
+                    const response = await fetch(`http://localhost:3000/trains/time?startTime=${startTime}&endTime=${endTime}`);
+                    const data = await response.json();
+
+                    if (data.message === '没有符合条件的车次') {
+                        document.getElementById('container5').innerHTML = `<p class="no-results">没有符合条件的车次</p>`;
+                    } else {
+                        updateTrainTableInContainer5([data]);
+                    }
+                } catch (error) {
+                    document.getElementById('container5').innerHTML = `<p class="no-results">请求失败，请稍后再试。</p>`;
+                    console.error("请求车次数据失败:", error);
+                }
+            } else {
+                alert("请输入有效的时间区间");
+            }
+        }
+
+        // 删除车次
+        async function deleteTrain() {
+            const trainNumber = document.getElementById('train-number').value.trim();
+
+            if (!trainNumber) {
+                alert('请输入车次号');
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:3000/trains/number/${trainNumber}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert('车次删除成功');
+                    fetchTrainData();  // 删除后重新获取车次数据并更新容器
+                    container5.innerHTML = "";
+                } else {
+                    alert(`删除车次失败: ${data.error || data.message}`);
+                }
+            } catch (error) {
+                console.error('请求失败:', error);
+                alert('请求失败，请稍后再试');
+            }
+        }
+
+        // 增加车次
+        async function addTrain() {
+            const trainData = {
+                train_number: document.getElementById('train-number').value.trim(),
+                departure_location: document.getElementById('departure').value.trim(),
+                destination_location: document.getElementById('destination').value.trim(),
+                departure_time: document.getElementById('departure-time').value,
+                arrival_time: document.getElementById('arrival-time').value,
+                first_class_price: document.getElementById('first-class-price').value,
+                first_class_availability: document.getElementById('first-class-availability').value,
+                second_class_price: document.getElementById('second-class-price').value,
+                second_class_availability: document.getElementById('second-class-availability').value,
+                sleeper_class_price: document.getElementById('sleeper-class-price').value,
+                sleeper_class_availability: document.getElementById('sleeper-class-availability').value,
+                first_sleeper_class_price: document.getElementById('first-sleeper-class-price').value,
+                first_sleeper_class_availability: document.getElementById('first-sleeper-class-availability').value,
+            };
+
+            try {
+                const response = await fetch('http://localhost:3000/trains', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(trainData)
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert('车次增加成功');
+                    fetchTrainData();  // 增加后重新获取车次数据并更新容器
+                    container5.innerHTML = "";
+                } else {
+                    alert(`增加车次失败: ${data.error || data.message}`);
+                }
+            } catch (error) {
+                console.error('请求失败:', error);
+                alert('请求失败，请稍后再试');
+            }
+        }
+
+        // 更新车次
+        async function updateTrain() {
+            const trainNumber = document.getElementById('train-number').value.trim();
+            const departure = document.getElementById('departure').value.trim();
+            const destination = document.getElementById('destination').value.trim();
+            const departureTime = document.getElementById('departure-time').value;
+            const arrivalTime = document.getElementById('arrival-time').value;
+            const firstClassPrice = parseFloat(document.getElementById('first-class-price').value);
+            const firstClassAvailability = parseInt(document.getElementById('first-class-availability').value);
+            const secondClassPrice = parseFloat(document.getElementById('second-class-price').value);
+            const secondClassAvailability = parseInt(document.getElementById('second-class-availability').value);
+            const sleeperClassPrice = parseFloat(document.getElementById('sleeper-class-price').value);
+            const sleeperClassAvailability = parseInt(document.getElementById('sleeper-class-availability').value);
+            const firstSleeperClassPrice = parseFloat(document.getElementById('first-sleeper-class-price').value);
+            const firstSleeperClassAvailability = parseInt(document.getElementById('first-sleeper-class-availability').value);
+
+            // 校验输入数据
+            if (isNaN(firstClassPrice) || firstClassPrice <= 0 || isNaN(firstClassAvailability) || firstClassAvailability < 0) {
+                alert("请检查一等座票价和余量");
+                return;
+            }
+            if (isNaN(secondClassPrice) || secondClassPrice <= 0 || isNaN(secondClassAvailability) || secondClassAvailability < 0) {
+                alert("请检查二等座票价和余量");
+                return;
+            }
+            if (isNaN(sleeperClassPrice) || sleeperClassPrice <= 0 || isNaN(sleeperClassAvailability) || sleeperClassAvailability < 0) {
+                alert("请检查卧铺票价和余量");
+                return;
+            }
+            if (isNaN(firstSleeperClassPrice) || firstSleeperClassPrice <= 0 || isNaN(firstSleeperClassAvailability) || firstSleeperClassAvailability < 0) {
+                alert("请检查一等卧票价和余量");
+                return;
+            }
+
+            // 构造请求体
+            const updatedTrain = {
+                train_number: trainNumber,
+                departure_location: departure,
+                destination_location: destination,
+                departure_time: departureTime,
+                arrival_time: arrivalTime,
+                first_class_price: firstClassPrice,
+                first_class_availability: firstClassAvailability,
+                second_class_price: secondClassPrice,
+                second_class_availability: secondClassAvailability,
+                sleeper_class_price: sleeperClassPrice,
+                sleeper_class_availability: sleeperClassAvailability,
+                first_sleeper_class_price: firstSleeperClassPrice,
+                first_sleeper_class_availability: firstSleeperClassAvailability
+            };
+
+            try {
+                const response = await fetch(`http://localhost:3000/trains/number/${trainNumber}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedTrain)
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert("车次信息更新成功！");
+                    fetchTrainData();  // 刷新所有车次数据
+                    document.getElementById('container5').innerHTML = "";
+                } else {
+                    alert("车次信息更新失败，请稍后再试！");
+                    console.error(result.message);
+                }
+            } catch (error) {
+                alert("更新失败，请稍后再试！");
+                console.error("请求失败:", error);
+            }
+        }
+
+
+        // 更新表格显示车次信息
+        function updateTrainTable(data) {
+            const resultsDiv = document.getElementById('query-results');
+            const table = document.createElement('table');
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>车次</th>
+                        <th>出发地</th>
+                        <th>目的地</th>
+                        <th>出发时间</th>
+                        <th>到达时间</th>
+                        <th>一等座票价</th>
+                        <th>一等座余量</th>
+                        <th>二等座票价</th>
+                        <th>二等座余量</th>
+                        <th>二等卧票价</th>
+                        <th>二等卧余量</th>
+                        <th>一等卧票价</th>
+                        <th>一等卧余量</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.map(train => `
+                        <tr>
+                            <td>${train.train_number}</td>
+                            <td>${train.departure_location}</td>
+                            <td>${train.destination_location}</td>
+                            <td>${convertToBeijingTime(train.departure_time).replace('T', ' ')}</td>
+                            <td>${convertToBeijingTime(train.arrival_time).replace('T', ' ')}</td>
+                            <td>${train.first_class_price}</td>
+                            <td>${train.first_class_availability}</td>
+                            <td>${train.second_class_price}</td>
+                            <td>${train.second_class_availability}</td>
+                            <td>${train.sleeper_class_price}</td>
+                            <td>${train.sleeper_class_availability}</td>
+                            <td>${train.first_sleeper_class_price}</td>
+                            <td>${train.first_sleeper_class_availability}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            `;
+            resultsDiv.innerHTML = "";
+            resultsDiv.appendChild(table);
+        }
+        // 更新 container5 中的车次信息
+        function updateTrainTableInContainer5([data]) {
+            const container5 = document.getElementById('container5');
+            container5.innerHTML = "";
+            const table = document.createElement('table');
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>车次</th>
+                        <th>出发地</th>
+                        <th>目的地</th>
+                        <th>出发时间</th>
+                        <th>到达时间</th>
+                        <th>一等座票价</th>
+                        <th>一等座余量</th>
+                        <th>二等座票价</th>
+                        <th>二等座余量</th>
+                        <th>二等卧票价</th>
+                        <th>二等卧余量</th>
+                        <th>一等卧票价</th>
+                        <th>一等卧余量</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.map(train => `
+                        <tr>
+                            <td>${train.train_number}</td>
+                            <td>${train.departure_location}</td>
+                            <td>${train.destination_location}</td>
+                            <td>${convertToBeijingTime(train.departure_time).replace('T', ' ')}</td>
+                            <td>${convertToBeijingTime(train.arrival_time).replace('T', ' ')}</td>
+                            <td>${train.first_class_price}</td>
+                            <td>${train.first_class_availability}</td>
+                            <td>${train.second_class_price}</td>
+                            <td>${train.second_class_availability}</td>
+                            <td>${train.sleeper_class_price}</td>
+                            <td>${train.sleeper_class_availability}</td>
+                            <td>${train.first_sleeper_class_price}</td>
+                            <td>${train.first_sleeper_class_availability}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            `;
+            
+            container5.appendChild(table);
+        }
+        // 将 UTC 时间转换为北京时间
+        function convertToBeijingTime(utcTime) {
+            const date = new Date(utcTime);  // 转换为 Date 对象
+            const options = { 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: false 
+            };
+            return date.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai', ...options });
+        }
+        // 初始化车次数据
+        fetchTrainData();
+
+        document.getElementById('backup-button').addEventListener('click', async function () {
+    try {
+        // 发送请求到后端的备份接口
+        const response = await fetch('http://localhost:3000/api/backup');
+        if (!response.ok) {
+            throw new Error(`备份请求失败，状态码: ${response.status}`);
+        }
+
+        // 获取当前本地时间
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+
+        // 格式化本地时间为 'YYYY-MM-DD_HH-MM-SS'
+        const timestamp = `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+
+        // 提示用户下载备份文件
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        
+        // 使用当前时间作为文件名的一部分
+        link.href = url;
+        link.download = `database_backup_${timestamp}.zip`;  // 设置下载文件名，包含本地时间戳
+
+        // 触发下载
+        link.click();
+
+        // 释放Blob URL
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        // 弹出错误信息
+        alert(`备份失败：${error.message}`);
+    }
+});
+
+
+    </script>
+</body>
+</html>
